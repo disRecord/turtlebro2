@@ -8,16 +8,14 @@ from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
+import xacro
+
 def generate_launch_description():
 
-    turtlebro_shared_path  = get_package_share_path('turtlebro')
-    default_model_path = turtlebro_shared_path / 'urdf/turtlebro.urdf'
-    
+    robot_description_path = os.path.join(get_package_share_directory('turtlebro'), 'urdf', 'turtlebro.urdf.xacro')
     model_arg = DeclareLaunchArgument(name='model', default_value=str(default_model_path),
                                       description='Absolute path to robot urdf file')
-
-    robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('model')]),
-                                       value_type=str)
+    robot_description = ParameterValue(xacro.process_file(LaunchConfiguration('model')), value_type=str)
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',

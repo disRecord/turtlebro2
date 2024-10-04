@@ -55,6 +55,7 @@ install(DIRECTORY
   launch
   urdf
   camera
+  meshes
   DESTINATION share/${PROJECT_NAME}/
 )
 
