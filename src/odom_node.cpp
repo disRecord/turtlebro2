@@ -21,7 +21,15 @@ class OdometryPublisher : public rclcpp::Node
     {
       RCLCPP_INFO(this->get_logger(), "Starting odometry_publisher CPP node");
 
-      tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+      this->declare_parameter("publish_tf", true);
+      bool publish_tf = this->get_parameter("publish_tf").as_bool();
+
+      if (publish_tf) {
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+      }
+      else {
+        tf_broadcaster_ = nullptr;
+      }
 
       pose_subscription_ = this->create_subscription<geometry_msgs::msg::Pose>(
           "/pose", 10, 
@@ -69,7 +77,9 @@ class OdometryPublisher : public rclcpp::Node
       t.transform.translation.y = msg->position.y;
       t.transform.translation.z = 0.0;
       t.transform.rotation = msg->orientation;  
-      tf_broadcaster_->sendTransform(t);
+      if (tf_broadcaster_ != nullptr) {
+        tf_broadcaster_->sendTransform(t);
+      }
 
     }
 
